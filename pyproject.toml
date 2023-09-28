@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "zaptec-costs"
+version = "0.1.0"
+description = "Calculate costs of Zaptec chargers"
+authors = ["Øyvind Evju <oyvevju@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.scripts]
+zaptec-costs = "zaptec_costs.main:main"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+jinja2 = "^3.1.2"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

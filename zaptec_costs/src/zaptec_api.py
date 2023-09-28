@@ -2,7 +2,7 @@ from collections import defaultdict
 import requests
 import datetime
 
-from src.secrets import Secrets
+from zaptec_costs.src.secrets import Secrets
 
 
 class ZaptecApi(requests.Session):
@@ -35,7 +35,7 @@ class ZaptecApi(requests.Session):
         assert (
             response.status_code == 200
         ), f"Failed to get chargers: {response.status_code} ({response.text})"
-        assert response.json()["Pages"] == 1, "More than one page of chargers"
+        assert response.json()["Pages"] <= 1, "More than one page of chargers"
         return response.json()["Data"]
 
     def get_energy_usage(self, charger_id):

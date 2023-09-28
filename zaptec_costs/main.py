@@ -1,11 +1,11 @@
-from src.secrets import Secrets
-from src.date import DATE_RANGE
-from src.elvia_api import ElviaApi
-from src.strompriser_api import StrompriserApi
-from src.zaptec_api import ZaptecApi
+from zaptec_costs.src.secrets import Secrets
+from zaptec_costs.src.date import DATE_RANGE
+from zaptec_costs.src.elvia_api import ElviaApi
+from zaptec_costs.src.strompriser_api import StrompriserApi
+from zaptec_costs.src.zaptec_api import ZaptecApi
 
 
-if __name__ == "__main__":
+def main():
     tariffs = ElviaApi().get_tariffs(DATE_RANGE.str().start, DATE_RANGE.str().end)
     power_prices = StrompriserApi().get_prices(DATE_RANGE.str().start, DATE_RANGE.str().end)
     zaptec_api = ZaptecApi()
@@ -58,3 +58,7 @@ if __name__ == "__main__":
             )
 
         print()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,7 +1,7 @@
 import requests
 import datetime
 
-from src.secrets import Secrets
+from zaptec_costs.src.secrets import Secrets
 
 
 class ElviaApi(requests.Session):

@@ -1,7 +1,7 @@
 from datetime import datetime
 import requests
 
-from src.secrets import Secrets
+from zaptec_costs.src.secrets import Secrets
 
 
 class StrompriserApi(requests.Session):

@@ -39,3 +39,23 @@ jobs:
       run: |
         poetry run zaptec-costs
         ls -la
+    - name: Store reports as artefacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: zaptec-reports
+        path: |
+          *.html
+    - name: Send reports via e-mail
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        secure: true
+        username: ${{ secrets.MAIL_USERNAME }}
+        password: ${{ secrets.MAIL_PASSWORD }}
+        subject: Github Actions job result
+        to: oyvevju@gmail.com,oyvind.evju@medisin.uio.no
+        from: Øyvind Evju # <user@example.com>
+        body: Build job of ${{github.repository}} completed successfully!
+        cc: oyvevju@gmail.com
+        attachments: "*.html"

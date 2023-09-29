@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zaptec Costs</title>
+    <style>
+        td, th {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        th:nth-child(1), th:nth-child(2),
+        td:nth-child(1), td:nth-child(2) {
+            text-align: left;
+        }
+        td:nth-child(3), td:nth-child(4), td:nth-child(5) {
+            text-align: right;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: whitesmoke;
+            margin: 2rem;
+            width: 50%;
+            color: rgba(0,0,0,0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div>
+            <h1>Zaptec Costs</h1>
+            <h2>{{ charger_name }}</h2>
+            <h2>{{ month }}</h2>
+        </div>
+        {% include 'totals.html' %}
+        {% include 'table.html' %}
+</body>
+</html>

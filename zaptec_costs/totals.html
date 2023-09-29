@@ -1,0 +1,7 @@
+<div>
+    <h3>Total costs</h3>
+    <p>Number of sessions: {{ charging_totals.num_sessions}}</p>
+    <p>Total kWh: {{ '{0:0.2f}'.format(charging_totals.kwh) }} kWh</p>
+    <p>Total cost: {{ '{0:0.2f}'.format(charging_totals.cost) }} kr</p>
+    <p><b>Total cost inc MVA: {{ '{0:0.2f}'.format(charging_totals.cost_inc_vat) }} kr</b></p>
+</div>

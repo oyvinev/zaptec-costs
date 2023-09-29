@@ -1,0 +1,19 @@
+<div>
+    <h3>All sessions</h3>
+    <table>
+        <th>Start time</th>
+        <th>End time</th>
+        <th>Duration</th>
+        <th>kWh</th>
+        <th>Cost</th>
+    {% for session in charging_totals.charging_sessions %}
+        <tr>
+            <td>{{ session.start_time.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ session.end_time.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ (session.duration.total_seconds() // 3600) | int }}h {{ ((session.duration.total_seconds() % 3600) // 60) | int }}m</td>
+            <td>{{ '{0:0.2f}'.format(session.kwh) }} kWh</td>
+            <td>{{ '{0:0.2f}'.format(session.cost) }} kr</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>

@@ -1,8 +1,10 @@
 from collections import defaultdict
 import requests
-import datetime
+from datetime import datetime
+from zaptec_costs.src.models import ChargingSession
 
 from zaptec_costs.src.secrets import Secrets
+from zaptec_costs.src.utils import utc_to_local
 
 
 class ZaptecApi(requests.Session):
@@ -25,10 +27,8 @@ class ZaptecApi(requests.Session):
 
     @staticmethod
     def floor(timestamp):
-        dt = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
-        return datetime.datetime.fromtimestamp(
-            dt.replace(minute=0, second=0, microsecond=0).timestamp()
-        )
+        dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+        return datetime.fromtimestamp(dt.replace(minute=0, second=0, microsecond=0).timestamp())
 
     def get_chargers(self):
         response = self.get(self.base_url + "chargers")
@@ -37,6 +37,40 @@ class ZaptecApi(requests.Session):
         ), f"Failed to get chargers: {response.status_code} ({response.text})"
         assert response.json()["Pages"] <= 1, "More than one page of chargers"
         return response.json()["Data"]
+
+    def get_charging_sessions(self, charger_id):
+        timeformat = "%Y-%m-%dT%H:%M:%S.%f%z"
+        response = self.get(
+            self.base_url + "chargehistory/",
+            params={
+                "chargerId": charger_id,
+                "detailLevel": 1,
+                "pageIndex": 0,
+                "pageSize": 5000,
+                "sortDescending": "true",
+            },
+        )
+        assert (
+            response.json()["Pages"] <= 1
+        ), "More than one page of charge history - not implemented"
+
+        for charge_session in response.json()["Data"]:
+            yield ChargingSession(
+                charger_name=charge_session["DeviceName"],
+                start_time=utc_to_local(
+                    datetime.strptime(charge_session["StartDateTime"], "%Y-%m-%dT%H:%M:%S.%f")
+                ),
+                end_time=utc_to_local(
+                    datetime.strptime(charge_session["EndDateTime"], "%Y-%m-%dT%H:%M:%S.%f")
+                ),
+                energy_usage=[
+                    (
+                        utc_to_local(datetime.strptime(x["Timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")),
+                        x["Energy"],
+                    )
+                    for x in charge_session["EnergyDetails"]
+                ],
+            )
 
     def get_energy_usage(self, charger_id):
         kwh = defaultdict(float)

@@ -15,7 +15,7 @@ It is based on Elvia tariffs and electricity prices in NO1 using https://www.hva
 
 Run `poetry install; poetry run zaptec-costs`
 
-This will print a summary of all charger costs per month, calculated from hourly prices.
+This will write a summary of all charger costs per month to HTML files, calculated from hourly prices.
 
 ## Environment variables
 

@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
-        sudo apt install language-pack-nb
+        sudo apt install -y language-pack-nb wkhtmltopdf
         sudo dpkg-reconfigure locales
         locale -a
     - name: Generate reports
@@ -45,6 +45,7 @@ jobs:
         name: zaptec-reports
         path: |
           *.html
+          *.pdf
     - name: Send reports via e-mail
       uses: dawidd6/action-send-mail@v3
       with:
@@ -53,9 +54,9 @@ jobs:
         secure: true
         username: ${{ secrets.MAIL_USERNAME }}
         password: ${{ secrets.MAIL_PASSWORD }}
-        subject: Github Actions job result
-        to: oyvevju@gmail.com,oyvind.evju@medisin.uio.no
-        from: Øyvind Evju # <user@example.com>
-        body: Build job of ${{github.repository}} completed successfully!
+        subject: Zaptec Cost reports are ready
+        to: oyvevju@gmail.com
+        from: Øyvind Evju
+        body: Zaptec Cost reports are attached
         cc: oyvevju@gmail.com
-        attachments: "*.html"
+        attachments: "*.pdf"

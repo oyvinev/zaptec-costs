@@ -1,4 +1,5 @@
 **/.vscode
 **/.venv/
 **/__pycache__/
-*.html
+**.html
+!zaptec_costs/**.html

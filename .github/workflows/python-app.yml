@@ -38,3 +38,4 @@ jobs:
         ZAPTEC_PASSWORD: ${{ secrets.ZAPTEC_PASSWORD }}
       run: |
         poetry run zaptec-costs
+        ls -la

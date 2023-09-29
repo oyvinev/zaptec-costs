@@ -1,26 +1,24 @@
-from datetime import timedelta
+import argparse
+from datetime import timedelta, datetime
 import locale
-
 from pathlib import Path
+
 from jinja2 import Environment, PackageLoader
 
 from zaptec_costs.src.models import DATE_RANGE, ChargingSession, ChargingTotals
 from zaptec_costs.src.utils import get_valid_filename
 from zaptec_costs.src.zaptec_api import ZaptecApi
+import pdfkit
 
 locale.setlocale(locale.LC_ALL, "nb_NO.UTF-8")
 
 
 def main():
-    from zaptec_costs.src.models import Tariff
-    from zaptec_costs.src.utils import utc_to_local
-    from datetime import datetime
-
     env = Environment(loader=PackageLoader("zaptec_costs", str(Path(__file__).parent)))
     template = env.get_template("template.html")
 
     charging_sessions = split_charging_sessions_by_month(get_charging_session())
-    charger_names = set(x.charger_name for x in charging_sessions)
+    charger_names = get_charger_names()
 
     for name in charger_names:
         for month in DATE_RANGE(padding=None).iter(months=1):
@@ -45,6 +43,12 @@ def main():
                         month=month.strftime("%B %Y"),
                     )
                 )
+            try:
+                pdfkit.from_file(str(filename), str(filename.with_suffix(".pdf")))
+            except OSError as e:
+                print(e)
+                print(f"Failed to generate PDF for {filename}")
+                continue
 
 
 def get_charging_session() -> list[ChargingSession]:
@@ -56,6 +60,11 @@ def get_charging_session() -> list[ChargingSession]:
         ),
         [],
     )
+
+
+def get_charger_names() -> list[str]:
+    zaptec_api = ZaptecApi()
+    return [charger["Name"] for charger in zaptec_api.get_chargers()]
 
 
 def split_charging_sessions_by_month(

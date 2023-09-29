@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import lru_cache
 import requests
 from datetime import datetime
 from zaptec_costs.src.models import ChargingSession
@@ -8,6 +9,11 @@ from zaptec_costs.src.utils import utc_to_local
 
 
 class ZaptecApi(requests.Session):
+    def __new__(cls):
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
         super().__init__()
         self.authenticate()
@@ -30,6 +36,7 @@ class ZaptecApi(requests.Session):
         dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
         return datetime.fromtimestamp(dt.replace(minute=0, second=0, microsecond=0).timestamp())
 
+    @lru_cache(maxsize=1)
     def get_chargers(self):
         response = self.get(self.base_url + "chargers")
         assert (
@@ -38,8 +45,8 @@ class ZaptecApi(requests.Session):
         assert response.json()["Pages"] <= 1, "More than one page of chargers"
         return response.json()["Data"]
 
+    @lru_cache(maxsize=128)
     def get_charging_sessions(self, charger_id):
-        timeformat = "%Y-%m-%dT%H:%M:%S.%f%z"
         response = self.get(
             self.base_url + "chargehistory/",
             params={
@@ -71,24 +78,3 @@ class ZaptecApi(requests.Session):
                     for x in charge_session["EnergyDetails"]
                 ],
             )
-
-    def get_energy_usage(self, charger_id):
-        kwh = defaultdict(float)
-        response = self.get(
-            self.base_url + "chargehistory/",
-            params={
-                "chargerId": charger_id,
-                "detailLevel": 1,
-                "pageIndex": 0,
-                "pageSize": 5000,
-                "sortDescending": "true",
-            },
-        )
-        assert (
-            response.json()["Pages"] <= 1
-        ), "More than one page of charge history - not implemented"
-
-        for charge_session in response.json()["Data"]:
-            for energy_detail in charge_session["EnergyDetails"]:
-                kwh[self.floor(energy_detail["Timestamp"])] += energy_detail["Energy"]
-        return kwh

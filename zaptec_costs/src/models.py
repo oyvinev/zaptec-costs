@@ -1,8 +1,11 @@
+import argparse
 from dataclasses import dataclass
+from typing import ClassVar
 from pydantic import BaseModel, Field, model_validator, computed_field
 from datetime import datetime, timedelta
 
 import requests
+from zaptec_costs.src.args import Args
 
 from zaptec_costs.src.secrets import Secrets
 
@@ -158,14 +161,11 @@ class DATE_RANGE_STR:
 
 
 class DATE_RANGE(BaseModel):
-    start: datetime = datetime.now().replace(
-        month=datetime.now().month - 1, day=1, hour=0, minute=0, second=0, microsecond=0
-    )
-    end: datetime = datetime.now().replace(
-        month=datetime.now().month, hour=0, minute=0, second=0, microsecond=0
-    )
-
+    start: datetime = Args.start
+    end: datetime = Args.end
     padding: timedelta | None = timedelta(days=1)
+
+    _args: ClassVar = None
 
     @model_validator(mode="after")
     def check(cls, values):
@@ -184,7 +184,8 @@ class DATE_RANGE(BaseModel):
         while start <= self.end:
             yield start
             start = start.replace(
-                month=start.month + months,
+                year=start.year + (start.month + months - 1) // 12,
+                month=(start.month + months - 1) % 12 + 1,
                 day=1,
                 hour=0,
                 minute=0,

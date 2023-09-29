@@ -10,12 +10,13 @@ It is based on Elvia tariffs and electricity prices in NO1 using https://www.hva
 - [Elvia API key](https://assets.ctfassets.net/jbub5thfds15/3Jm2yspPw1kFmDEkzdjhfw/e3a153543d8f95e889285248e5af21af/Elvia_GridTariffAPI_for_smart_house_purposes_DIGIN.pdf)
 - Python 3.10+
 - poetry
+- wkhtmltopdf (to generate PDF files)
 
 ## Usage
 
 Run `poetry install; poetry run zaptec-costs`
 
-This will write a summary of all charger costs per month to HTML files, calculated from hourly prices.
+This will write a summary of all charger costs per month to HTML/PDF files, calculated from hourly prices.
 
 ## Environment variables
 
